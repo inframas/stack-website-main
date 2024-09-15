@@ -1,0 +1,1 @@
+docker run -d --name mongodb-container -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=inframas -e MONGO_INITDB_ROOT_PASSWORD='!nfR4m4sT9cHn0logY4dm!nsYSt9mM0NG0' mongo:4.4
