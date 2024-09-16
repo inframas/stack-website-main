@@ -15,13 +15,13 @@ load_dotenv()
 # Create the FastAPI app
 app = FastAPI()
 
-# Add CORS middleware with allow_credentials=True
+# Add the CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with your frontend URL
-    allow_credentials=True,  # This allows sending cookies
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["*"],  # You can allow all origins with ['*']
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (POST, GET, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
 # Add session middleware

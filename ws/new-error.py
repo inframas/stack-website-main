@@ -8,8 +8,6 @@ from pymongo import MongoClient
 from passlib.context import CryptContext
 from datetime import datetime
 from dotenv import load_dotenv
-import json
-import requests
 
 # Load environment variables from .env file
 load_dotenv()
@@ -35,8 +33,6 @@ mongo_password = os.getenv("MONGO_PASSWORD")
 mongo_host = os.getenv("MONGO_HOST")
 mongo_port = os.getenv("MONGO_PORT")
 mongo_db = os.getenv("MONGO_DB")
-
-base_url_ws = os.getenv("BASE_URL_WS")
 
 # Setup MongoDB connection
 mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/?authSource=admin"
@@ -97,9 +93,6 @@ class RegisterData(BaseModel):
 class UserIdRequestUsersCards(BaseModel):
     user_id: str
 
-class RequestCardId(BaseModel):
-    card_id: str
-
 
 
 
@@ -132,36 +125,20 @@ def generate_user_id():
 @app.get("/")
 async def home(request: Request):
     if "user" in request.session:
-        user = request.session['user']
         return {"message": f"Hello, {request.session['user']}!"}
     return {"message": "You are not logged in. Please log in."}
 
-# @app.get("/check-session", tags=["Authentication"])
-# async def home(request: Request):
-#     if "user" in request.session:
-#         user = request.session['user']
-#         return user
-#     return {"message": "You are not logged in. Please log in."}
-
-
-# @app.get("/check-session", tags=["Authentication"])
-# async def check_session(request: Request):
-#     if "user" in request.session:
-#         user = request.session['user']
-#         user = request.session['user_id']
-#         return {"user_id": request.session.get('user_id'),
-#         "user" : request.session.get('user')}
-#     return {"user_id": None}  # Return `None` or an empty value explicitly
-
-
-@app.get("/check-session")
-async def check_session(request: Request):
+@app.get("/check-session", tags=["Authentication"])
+async def home(request: Request):
     if "user" in request.session:
-        # Session is active
-        return {"status": "active", "user": request.session["user"], "user_id": request.session["user_id"]}
-    else:
-        # No active session
-        return {"status": "inactive", "message": "No active session"}
+        user = request.session['user']
+        # return {
+        #     "user_id" : user
+        # }
+        return user
+    return {"message": "You are not logged in. Please log in."}
+
+
 
 # Register endpoint
 @app.post("/register", tags=["Authentication"])
@@ -258,7 +235,7 @@ async def get_user_cards(body: UserIdRequestUsersCards):
     user_id = body.user_id
     
     db, users_collection = connect_to_mongo("users-cards")
-    user_data_cards = users_collection.find({"user_id" : user_id})
+    user_data_cards = users_collection.find({"users_id" : user_id})
     
     if not user_id:
         raise HTTPException(status_code=400, detail="user_id is required")
@@ -270,57 +247,11 @@ async def get_user_cards(body: UserIdRequestUsersCards):
 
     if user_data_cards:
         for data_one_card in user_data_cards:
-
-            # card_list.append(data_one_card)
-            card_metadata_id = data_one_card['card_metadata_id']
-
-
-            db_one_card, users_collection_one_card = connect_to_mongo("cards")
-            one_card = users_collection_one_card.find_one({"_id" : card_metadata_id})
-
-            card_list.append(one_card)
-
-
+            card_list.append(data_one_card)
 
     return card_list
-
-
-
-
-
-@app.post("/cards/get-card-metadata", tags=["Cards"])
-async def get_card_metadata(body: RequestCardId):
-    card_id = body.card_id
-    
-    db, users_collection = connect_to_mongo("cards")
-    data_card = users_collection.find_one({"_id" : card_id})
-    
-    if not card_id:
-        raise HTTPException(status_code=400, detail="user_id is required")
-
-    return data_card
-
-
-
 
 @app.get("/cards/get-user-card-one", tags=["Cards"])
 async def logout(request: Request):
     request.session.pop('user', None)
     return {"message": "Logged out successfully"}
-
-
-
-
-@app.get("/leaderboard", tags=["Tools"])
-async def leaderboard():
-
-    db, users_collection = connect_to_mongo("users")
-    data_leaderboard = users_collection.find({}).sort('throphy', -1)
-
-    leaderboard_list = []
-
-    for one_leaderboard in data_leaderboard:
-        leaderboard_list.append(one_leaderboard)
-
-    # return {"message": "Logged out successfully"}
-    return leaderboard_list
