@@ -5,14 +5,14 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy package.json and package-lock.json to the working directory
-# COPY package*.json ./
-COPY . .
+COPY package*.json ./
+# COPY . .
 
 # Install dependenciesf
 RUN npm install
 
 # Copy the rest of the application code to the working directory
-# COPY . .
+COPY . .
 
 # Expose the port that the React app runs on
 EXPOSE 3000
