@@ -26,9 +26,6 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-
-
-
 # Add session middleware
 app.add_middleware(SessionMiddleware, secret_key="testing")
 
