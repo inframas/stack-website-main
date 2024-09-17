@@ -26,6 +26,9 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
+
+
+
 # Add session middleware
 app.add_middleware(SessionMiddleware, secret_key="testing")
 
@@ -162,6 +165,18 @@ async def check_session(request: Request):
     else:
         # No active session
         return {"status": "inactive", "message": "No active session"}
+
+@app.options("/check-session")
+async def handle_options():
+    return JSONResponse(
+        content={},
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, DELETE, PUT, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Credentials": "true",
+        },
+    )
 
 # Register endpoint
 @app.post("/register", tags=["Authentication"])
