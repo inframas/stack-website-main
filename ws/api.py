@@ -155,13 +155,38 @@ async def home(request: Request):
 
 
 @app.get("/check-session")
+# async def check_session(request: Request):
+#     if "user" in request.session:
+#         # Session is active
+#         return {"status": "active", "user": request.session["user"], "user_id": request.session["user_id"]}
+#     else:
+#         # No active session
+#         return {"status": "inactive", "message": "No active session"}
 async def check_session(request: Request):
-    if "user" in request.session:
-        # Session is active
-        return {"status": "active", "user": request.session["user"], "user_id": request.session["user_id"]}
+    if user in request.session:
+        return JSONResponse(
+            content={"status": "active", "user": request.session["user"], "user_id": request.session["user_id"]},
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Credentials": "true",
+            },
+        )
+
     else:
-        # No active session
-        return {"status": "inactive", "message": "No active session"}
+        return JSONResponse(
+            content={"status": "inactive", "message": "No active session"},
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Credentials": "true",
+            },
+        )
+        
+
+
 
 @app.options("/check-session")
 async def handle_options():
